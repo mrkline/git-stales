@@ -1,12 +1,12 @@
-import std.stdio;
-import std.conv : to;
-import std.process;
 import std.algorithm;
-import std.exception : enforce;
-import std.string : strip, stripLeft, indexOf;
 import std.array : array;
-import std.typecons : tuple;
+import std.conv : to;
 import std.datetime;
+import std.exception : enforce;
+import std.process;
+import std.stdio;
+import std.string : strip, stripLeft, indexOf;
+import std.typecons : tuple;
 
 /// Returns a range of branches that are on both remotes
 auto findRemoteBranches()
