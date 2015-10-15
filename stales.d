@@ -3,10 +3,13 @@ import std.array : array;
 import std.conv : to;
 import std.datetime;
 import std.exception : enforce;
+import std.getopt;
 import std.process;
 import std.stdio;
 import std.string : strip, stripLeft, indexOf;
 import std.typecons : tuple;
+
+import help;
 
 /// Returns a range of branches that are on both remotes
 auto findRemoteBranches()
@@ -68,21 +71,58 @@ auto aheadBehindCounts(string branch, string upstream = "master")
     return tuple!("ahead", "behind")(ahead.to!int, behind.to!int);
 }
 
-int main()
+int main(string[] args)
 {
+    int ageCutoff = 30;
+    int verbose = 0;
+
+    try {
+        getopt(args,
+               config.caseSensitive,
+               config.bundling,
+               "help|h", { writeAndSucceed(helpText); },
+               "version|V", { writeAndSucceed(versionString); },
+               "verbose|v+", &verbose,
+               "age-cutoff|a", &ageCutoff
+              );
+    }
+    catch (GetOptException ex) {
+        writeAndFail(ex.msg, "\n\n", helpText);
+    }
+
+    if (ageCutoff < 1) writeAndFail("Age cutoff must be at least one day");
+
+    string[] stales;
+
     foreach (branch; findRemoteBranches()) {
         immutable counts = aheadBehindCounts(branch);
         // Ignore unmerged branches
-        if (counts.ahead > 0)
+        if (counts.ahead > 0) {
+            if (verbose > 1) {
+                stderr.writeln(branch, " has ", counts.ahead,
+                               " unmerged commits. Skipping.");
+            }
             continue;
+        }
 
         // Ignore younger branches
         immutable ageInDays = ageOfBranch(branch).total!"days";
-        if (ageInDays < 30)
+        if (ageInDays < ageCutoff) {
+            if (verbose > 1) {
+                stderr.writeln(branch, " is ", ageInDays,
+                               " days old. Skipping.");
+            }
             continue;
+        }
 
-        writeln(branch, " is ", ageInDays, " days old and ",
-                counts.behind, " commits behind master.");
+        if (verbose > 0) {
+            stderr.writeln(branch, " is ", ageInDays, " days old and ",
+                           counts.behind, " commits behind master.");
+        }
+        stales ~= branch;
     }
+    writeln("Stale branches:");
+    foreach (stale; stales)
+        writeln(stale);
     return 0;
 }

@@ -9,7 +9,7 @@ debug: stales
 release: DFLAGS += -release -O
 release: stales
 
-stales: stales.d
+stales: stales.d help.d
 	$(DC) $(DFLAGS) -of$@ $^
 
 clean:
