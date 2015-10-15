@@ -42,10 +42,10 @@ auto splitRemoteNameFromBranch(string branch) pure
 
 Duration ageOfBranch(string branch)
 {
-    auto showResult = execute(["git", "show", "-s", "--format=%cI", branch]);
+    auto showResult = execute(["git", "show", "-s", "--format=%cD", branch]);
     enforce(showResult.status == 0, "git show failed on branch " ~ branch);
-    immutable iso = showResult.output.strip();
-    immutable branchDate = SysTime.fromISOExtString(iso);
+    immutable rfc822 = showResult.output.strip();
+    immutable branchDate = parseRFC822DateTime(rfc822);
     return Clock.currTime - branchDate;
 }
 
