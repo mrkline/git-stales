@@ -25,7 +25,7 @@ string helpText = q"EOS
 Usage: stales [--age-cutoff]
 
 stales, when run from a Git directory, lists all branches that are merged into
-the upstream/trunk branch (usually "master") and are older than a given number
+the main/trunk branch (usually "master") and are older than a given number
 of days. Such branches are usually good candidates for deletion to keep clutter
 down in the repository.
 
@@ -37,9 +37,16 @@ Options:
   --version, -V
     Display version information.
 
+  --main-branch, -m <branch name>
+    Specifies the main/trunk branch. Defaults to "master"
+
   --age-cutoff, -a <days>
     Specifies in days the oldest a merged branch can be before it is considered
     stale. Defaults to 30.
+
+  --keep, -k <branch or regular expression>
+    Specifies a branch to keep. Can be a regular expression.
+    Can be given multiple times.
 
   --verbose, -v
     Print extra info as the branches are examined to stderr.

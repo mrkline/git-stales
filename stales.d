@@ -5,6 +5,7 @@ import std.datetime;
 import std.exception : enforce;
 import std.getopt;
 import std.process;
+import std.regex;
 import std.stdio;
 import std.string : strip, stripLeft, indexOf;
 import std.typecons : tuple;
@@ -12,8 +13,12 @@ import std.typecons : tuple;
 import help;
 
 /// Returns a range of branches that are on both remotes
-auto findRemoteBranches()
+auto findRemoteBranches(string[] keepers)
 {
+    // Compile our regular expressions first
+    // (to spit out any regex errors before we light up "git branch")
+    Regex!char[] regexes = keepers.map!(k => regex(k)).array;
+
     // -r lists remote branches
     auto remoteBranchFinder = pipeProcess(["git", "branch", "-r"], Redirect.stdout);
     // Make sure the process dies with us
@@ -28,6 +33,8 @@ auto findRemoteBranches()
         .filter!(b => !b.canFind("->"))
         // git branch -r puts whitespace on the left. Strip that.
         .map!(b => stripLeft(b))
+        // Filter out ones we want to keep
+        .filter!(b => !regexes.any!(r => b.matchFirst(r)))
         // Allocate a new string for each line (byLine reuses a buffer)
         .map!(m => m.idup);
 
@@ -52,13 +59,13 @@ Duration ageOfBranch(string branch)
     return Clock.currTime - branchDate;
 }
 
-// Gives how many commits branch is ahead and behind upstream
-auto aheadBehindCounts(string branch, string upstream = "master")
+// Gives how many commits branch is ahead and behind mainBranch
+auto aheadBehindCounts(string branch, string mainBranch = "master")
 {
     auto revListResult = execute(
-        ["git", "rev-list", "--left-right", "--count", branch ~ "..." ~ upstream]);
+        ["git", "rev-list", "--left-right", "--count", branch ~ "..." ~ mainBranch]);
     enforce(revListResult.status == 0,
-            "git rev-list failed on branches " ~ branch ~ " and " ~ upstream);
+            "git rev-list failed on branches " ~ branch ~ " and " ~ mainBranch);
 
     // The above rev-list command gives <commits ahead><tab><commits behind>
     auto counts = revListResult.output.strip().splitter('\t');
@@ -74,6 +81,8 @@ auto aheadBehindCounts(string branch, string upstream = "master")
 int main(string[] args)
 {
     int ageCutoff = 30;
+    string mainBranch = "master";
+    string[] keepers;
     int verbose = 0;
 
     try {
@@ -83,7 +92,9 @@ int main(string[] args)
                "help|h", { writeAndSucceed(helpText); },
                "version|V", { writeAndSucceed(versionString); },
                "verbose|v+", &verbose,
-               "age-cutoff|a", &ageCutoff
+               "main-branch|m", &mainBranch,
+               "age-cutoff|a", &ageCutoff,
+               "keep|k", &keepers,
               );
     }
     catch (GetOptException ex) {
@@ -92,10 +103,13 @@ int main(string[] args)
 
     if (ageCutoff < 1) writeAndFail("Age cutoff must be at least one day");
 
+    if (pushDeletes && dryRun)
+        writeAndFail("--push-deletes and --dry-run specified (pick one)");
+
     string[] stales;
 
-    foreach (branch; findRemoteBranches()) {
-        immutable counts = aheadBehindCounts(branch);
+    foreach (branch; findRemoteBranches(keepers)) {
+        immutable counts = aheadBehindCounts(branch, mainBranch);
         // Ignore unmerged branches
         if (counts.ahead > 0) {
             if (verbose > 1) {
@@ -117,7 +131,7 @@ int main(string[] args)
 
         if (verbose > 0) {
             stderr.writeln(branch, " is ", ageInDays, " days old and ",
-                           counts.behind, " commits behind master.");
+                           counts.behind, " commits behind ", mainBranch, '.');
         }
         stales ~= branch;
     }
