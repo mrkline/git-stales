@@ -48,6 +48,13 @@ Options:
     Specifies a branch to keep. Can be a regular expression.
     Can be given multiple times.
 
+  --push-deletes, -d
+    Delete stale branches from the remote(s) using "git push --delete ...".
+
+  --dry-run, -n
+    Like --push-deletes, but just write the command(s) to stdout
+    instead of running them.
+
   --verbose, -v
     Print extra info as the branches are examined to stderr.
     Specify multiple times for additional info.

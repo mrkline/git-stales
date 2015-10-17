@@ -84,6 +84,8 @@ int main(string[] args)
     string mainBranch = "master";
     string[] keepers;
     int verbose = 0;
+    bool pushDeletes = false;
+    bool dryRun = false;
 
     try {
         getopt(args,
@@ -95,6 +97,8 @@ int main(string[] args)
                "main-branch|m", &mainBranch,
                "age-cutoff|a", &ageCutoff,
                "keep|k", &keepers,
+               "push-deletes|d", &pushDeletes,
+               "dry-run|n", &dryRun,
               );
     }
     catch (GetOptException ex) {
@@ -135,8 +139,17 @@ int main(string[] args)
         }
         stales ~= branch;
     }
-    writeln("Stale branches:");
-    foreach (stale; stales)
-        writeln(stale);
+    if (dryRun || pushDeletes) {
+        writeln("TODO: build git push --delete commmand");
+
+        if (pushDeletes) {
+            writeln("TODO: Do iiiiit. Do it now.");
+        }
+    }
+    else {
+        writeln("Stale branches:");
+        foreach (stale; stales)
+            writeln(stale);
+    }
     return 0;
 }
