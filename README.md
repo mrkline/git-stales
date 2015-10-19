@@ -3,7 +3,9 @@
 Finds git branches that haven't been touched in a while and aren't unmerged,
 making them good candidates for deletion.
 
-This is a hard-coded proof of concept. Desired additions:
+See `help.d` for the various options, which include:
 
-- Command line options (crazy, right?) such as minimum age
-- Mode to run "git push --delete" to the remote to remove these stale branches
+- Which branch is the main ("master") branch
+- How old (in days) a branch must be in order to be considered stale
+- Which branches to keep, regardless of age
+- Options to generate (or run!) a `git push` command to delete stale branches
