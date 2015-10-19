@@ -22,7 +22,7 @@ stales v0.1 by Matt Kline, Fluke Networks
 EOS";
 
 string helpText = q"EOS
-Usage: stales [--age-cutoff]
+Usage: stales [--main-branch <branch>] [--age-cutoff <days>]
 
 stales, when run from a Git directory, lists all branches that are merged into
 the main/trunk branch (usually "master") and are older than a given number
