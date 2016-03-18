@@ -136,7 +136,8 @@ int main(string[] args)
         }
 
         // Ignore younger branches
-        immutable ageInDays = ageOfBranch(branch).total!"days";
+        immutable ageInDays =
+                (ageOfBranch(branch) - ageOfBranch(mainBranch)).total!"days";
         if (ageInDays < ageCutoff) {
             if (verbosity > 1) {
                 stderr.writeln(branch, " is ", ageInDays,
