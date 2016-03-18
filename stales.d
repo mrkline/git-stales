@@ -33,10 +33,10 @@ auto findRemoteBranches(string[] keepers)
         .filter!(b => !b.canFind("->"))
         // git branch -r puts whitespace on the left. Strip that.
         .map!(b => stripLeft(b))
-        // Filter out ones we want to keep
-        .filter!(b => !regexes.any!(r => b.matchFirst(r)))
         // Allocate a new string for each line (byLine reuses a buffer)
-        .map!(m => m.idup);
+        .map!(m => m.idup)
+        // Filter out ones we want to keep
+        .filter!(b => !regexes.any!(r => extractBranchName(b).matchFirst(r)));
 
     return remoteBranches.array;
 }
