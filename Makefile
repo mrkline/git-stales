@@ -1,5 +1,5 @@
-DC = dmd
-DFLAGS = -w -wi
+DC ?= dmd
+DFLAGS ?= -w -wi
 
 all: debug
 
