@@ -18,7 +18,7 @@ void writeAndFail(S...)(S helpText)
 }
 
 string versionString = q"EOS
-stales v0.2 by Matt Kline, Fluke Networks
+stales v0.2.1 by Matt Kline, Fluke Networks
 EOS";
 
 string helpText = q"EOS
@@ -50,17 +50,18 @@ Options:
 
   --branch-types, -t <local|remote|both>
     Specifies which branches (local, remote, or both) to check.
-    Defaults to both.
+    Defaults to "both".
 
   --push-deletes, -d
-    Delete stale branches from the remote(s) using "git push --delete ...".
+    Delete stale branches (locally using "git branch -d ..."
+    and from the remote(s) using "git push --delete ...").
 
   --dry-run, -n
     Like --push-deletes, but just write the command(s) to stdout
     instead of running them.
 
   --verbose, -v
-    Print extra info as the branches are examined to stderr.
+    Print extra info to stderr as the branches are examined.
     Specify multiple times for additional info.
 
 EOS";
