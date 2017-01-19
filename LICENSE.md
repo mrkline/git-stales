@@ -1,6 +1,6 @@
 # Licenze (zlib)
 
-Copyright (C) 2015–2016 Matt Kline, Fluke Networks
+Copyright (C) 2015–2017 Matt Kline, Fluke Networks
 
 This software is provided 'as-is', without any express or implied
 warranty.  In no event will the authors be held liable for any damages
