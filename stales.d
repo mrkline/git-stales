@@ -241,7 +241,8 @@ int main(string[] args)
                 write("deleting local branches...");
                 stdout.flush();
                 auto deleteResult = execute(localDeleteCommand);
-                enforce(deleteResult.status == 0, "git branch -d failed");
+                enforce(deleteResult.status == 0,
+                        "'" ~ localDeleteCommand.join(" ") ~ "' failed");
                 writeln(" done");
             }
             else {
@@ -267,7 +268,8 @@ int main(string[] args)
                     write("deleting remote branches...");
                     stdout.flush();
                     auto deleteResult = execute(remoteDeleteCommand);
-                    enforce(deleteResult.status == 0, "git push --delete failed");
+                    enforce(deleteResult.status == 0,
+                            "'" ~ remoteDeleteCommand.join(" ") ~ "' failed");
                     writeln(" done");
                 }
                 else {
